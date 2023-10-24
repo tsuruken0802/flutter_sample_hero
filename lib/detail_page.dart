@@ -59,11 +59,9 @@ class _DetailPageState extends State<DetailPage>
     // 現在の写真の幅と高さ
     final imageWidth =
         max(initialWidth - _draggedVerticalOffset, animationMixWidth);
-    final imageHeight = imageWidth;
     // 現在の写真の縮小の比率(0~1)
     final imageRatio =
         _getImageRatio(animationMixWidth, initialWidth, imageWidth);
-
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
@@ -123,7 +121,6 @@ class _DetailPageState extends State<DetailPage>
                     tag: 'imagePath-${widget.imagePath}',
                     child: SizedBox(
                       width: imageWidth,
-                      height: imageHeight,
                       child: Image.asset(
                         widget.imagePath,
                         fit: BoxFit.cover,
