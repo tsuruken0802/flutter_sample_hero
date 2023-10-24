@@ -11,33 +11,37 @@ class ListPage extends StatelessWidget {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.separated(
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.0,
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+          ),
           itemCount: imagePathList.length,
-          separatorBuilder: (context, index) => const Divider(),
           itemBuilder: (context, index) {
             final imagePath = imagePathList[index];
             return GestureDetector(
               onTap: () {
                 final route = PageRouteBuilder(
-                  opaque: false,
+                  opaque: false, // 詳細画面から戻る時に透けさせる
                   pageBuilder: (context, animation1, animation2) =>
                       DetailPage(imagePath: imagePath),
                   transitionDuration: const Duration(milliseconds: 300),
                 );
                 Navigator.of(context).push(route);
               },
-              child: SizedBox(
-                width: 100,
-                height: 200,
-                child: Hero(
-                  tag: 'imagePath-$imagePath',
-                  child: Image.asset(imagePathList[index]),
+              child: Hero(
+                tag: 'imagePath-$imagePath',
+                child: Image.asset(
+                  imagePathList[index],
+                  fit: BoxFit.cover,
                 ),
               ),
             );
           },
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
