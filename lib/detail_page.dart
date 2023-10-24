@@ -16,32 +16,33 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage>
     with SingleTickerProviderStateMixin {
-  double _draggedTopOffset = 0;
-  double _draggedLeftOffset = 0;
+  // 写真のドラッグによるオフセット
+  double _draggedVerticalOffset = 0;
+  double _draggedHorizontalOffset = 0;
 
-  late ScrollController scrollController;
-  late AnimationController _controller;
-  late Animation<double> _topAnimation;
-  late Animation<double> _leftAnimation;
+  late ScrollController _scrollController;
+  late AnimationController _animationController;
+  late Animation<double> _verticalAnimation;
+  late Animation<double> _horizontalAnimation;
 
   @override
   void initState() {
     super.initState();
-    scrollController = ScrollController();
-    _controller = AnimationController(
+    _scrollController = ScrollController();
+    _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200))
       ..addListener(() {
         setState(() {
-          _draggedTopOffset = _topAnimation.value;
-          _draggedLeftOffset = _leftAnimation.value;
+          _draggedVerticalOffset = _verticalAnimation.value;
+          _draggedHorizontalOffset = _horizontalAnimation.value;
         });
       });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    scrollController.dispose();
+    _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -51,65 +52,76 @@ class _DetailPageState extends State<DetailPage>
 
   @override
   Widget build(BuildContext context) {
-    const minWidth = 200.0;
+    // 写真の幅の初期値
     final initialWidth = MediaQuery.of(context).size.width;
-    final width = max(initialWidth - _draggedTopOffset, minWidth);
-    final ratio = calculateRatio(minWidth, initialWidth, width);
-    final height = width;
+    // アニメーション時の写真の最小幅
+    final animationMixWidth = initialWidth / 2;
+    // 現在の写真の幅と高さ
+    final imageWidth =
+        max(initialWidth - _draggedVerticalOffset, animationMixWidth);
+    final imageHeight = imageWidth;
+    // 現在の写真の縮小の比率(0~1)
+    final imageRatio =
+        calculateRatio(animationMixWidth, initialWidth, imageWidth);
 
     return Scaffold(
-      backgroundColor: Colors.white.withOpacity(ratio),
+      backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
-        backgroundColor: Colors.blue.withOpacity(ratio),
+        backgroundColor: Colors.blue.withOpacity(imageRatio),
         elevation: 0,
       ),
       body: Listener(
         onPointerDown: (PointerDownEvent event) {
-          if (scrollController.position.pixels > 0) return;
-          _controller.stop();
+          // アニメーションは一番上までスクロールしてから始める
+          if (_scrollController.position.pixels > 0) return;
+          // 前回のアニメーションを停止しておく
+          _animationController.stop();
         },
         onPointerMove: (PointerMoveEvent event) {
-          if (scrollController.position.pixels > 0) return;
+          if (_scrollController.position.pixels > 0) return;
           final delta = event.delta;
-          if (_draggedTopOffset + delta.dy < 0) {
+          if (_draggedVerticalOffset + delta.dy < 0) {
+            // 上までドラッグできないようにする
             return;
           }
           setState(() {
-            _draggedTopOffset += delta.dy;
-            _draggedLeftOffset += delta.dx;
+            // ドラッグした量を写真の位置とサイズに反映させる
+            _draggedVerticalOffset += delta.dy;
+            _draggedHorizontalOffset += delta.dx;
           });
         },
         onPointerUp: (PointerUpEvent event) {
-          if (ratio <= 0.0) {
+          if (imageRatio <= 0.0) {
+            // 閾値を超えた状態でドラッグを終了したら前の画面に戻る
             Navigator.of(context).pop();
             return;
           }
 
-          _topAnimation = Tween<double>(
-            begin: _draggedTopOffset,
+          // 写真を元のサイズと位置に戻すアニメーション実行
+          _verticalAnimation = Tween<double>(
+            begin: _draggedVerticalOffset,
             end: 0.0,
-          ).animate(_controller);
-
-          _leftAnimation = Tween<double>(
-            begin: _draggedLeftOffset,
+          ).animate(_animationController);
+          _horizontalAnimation = Tween<double>(
+            begin: _draggedHorizontalOffset,
             end: 0.0,
-          ).animate(_controller);
-
-          _controller.forward(from: 0);
+          ).animate(_animationController);
+          _animationController.forward(from: 0);
         },
         child: SingleChildScrollView(
-          controller: scrollController,
+          controller: _scrollController,
           child: SizedBox(
             width: double.infinity, // 写真が縮小に比例してColumnも小さくなりy軸の移動がズレるため固定する
             child: Column(
               children: [
                 Transform.translate(
-                  offset: Offset(_draggedLeftOffset, _draggedTopOffset),
+                  offset:
+                      Offset(_draggedHorizontalOffset, _draggedVerticalOffset),
                   child: Hero(
                     tag: 'imagePath-${widget.imagePath}',
                     child: SizedBox(
-                      width: width,
-                      height: height,
+                      width: imageWidth,
+                      height: imageHeight,
                       child: Image.asset(
                         widget.imagePath,
                         fit: BoxFit.cover,
@@ -117,6 +129,13 @@ class _DetailPageState extends State<DetailPage>
                     ),
                   ),
                 ),
+                const Padding(
+                  padding: EdgeInsets.all(32.0),
+                  child: Text(
+                    "長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列",
+                    style: TextStyle(fontSize: 30),
+                  ),
+                )
               ],
             ),
           ),
