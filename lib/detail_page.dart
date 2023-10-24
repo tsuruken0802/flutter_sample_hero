@@ -55,6 +55,7 @@ class _DetailPageState extends State<DetailPage>
     final initialWidth = MediaQuery.of(context).size.width;
     final width = max(initialWidth - _draggedTopOffset, minWidth);
     final ratio = calculateRatio(minWidth, initialWidth, width);
+    final height = width;
 
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(ratio),
@@ -98,23 +99,26 @@ class _DetailPageState extends State<DetailPage>
         },
         child: SingleChildScrollView(
           controller: scrollController,
-          child: Column(
-            children: [
-              Transform.translate(
-                offset: Offset(_draggedLeftOffset, _draggedTopOffset),
-                child: Hero(
-                  tag: 'imagePath-${widget.imagePath}',
-                  child: SizedBox(
-                    width: width,
-                    height: width,
-                    child: Image.asset(
-                      widget.imagePath,
-                      fit: BoxFit.cover,
+          child: SizedBox(
+            width: double.infinity, // 写真が縮小に比例してColumnも小さくなりy軸の移動がズレるため固定する
+            child: Column(
+              children: [
+                Transform.translate(
+                  offset: Offset(_draggedLeftOffset, _draggedTopOffset),
+                  child: Hero(
+                    tag: 'imagePath-${widget.imagePath}',
+                    child: SizedBox(
+                      width: width,
+                      height: height,
+                      child: Image.asset(
+                        widget.imagePath,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
