@@ -46,7 +46,7 @@ class _DetailPageState extends State<DetailPage>
     super.dispose();
   }
 
-  double calculateRatio(double min, double max, double value) {
+  double _getImageRatio(double min, double max, double value) {
     return (value - min) / (max - min);
   }
 
@@ -62,7 +62,7 @@ class _DetailPageState extends State<DetailPage>
     final imageHeight = imageWidth;
     // 現在の写真の縮小の比率(0~1)
     final imageRatio =
-        calculateRatio(animationMixWidth, initialWidth, imageWidth);
+        _getImageRatio(animationMixWidth, initialWidth, imageWidth);
 
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(imageRatio),
