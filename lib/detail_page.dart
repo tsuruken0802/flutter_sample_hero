@@ -16,8 +16,6 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage>
     with SingleTickerProviderStateMixin {
-  final double _currentTopOffset = 0;
-  final double _currentLeftOffset = 0;
   double _draggedTopOffset = 0;
   double _draggedLeftOffset = 0;
 
@@ -25,8 +23,6 @@ class _DetailPageState extends State<DetailPage>
   late AnimationController _controller;
   late Animation<double> _topAnimation;
   late Animation<double> _leftAnimation;
-
-  bool enableScroll = true;
 
   @override
   void initState() {
@@ -40,14 +36,6 @@ class _DetailPageState extends State<DetailPage>
           _draggedLeftOffset = _leftAnimation.value;
         });
       });
-
-    scrollController.addListener(() {
-      if (scrollController.position.pixels <= 0) {
-        setState(() {
-          enableScroll = false;
-        });
-      }
-    });
   }
 
   @override
@@ -77,20 +65,12 @@ class _DetailPageState extends State<DetailPage>
       body: Listener(
         onPointerDown: (PointerDownEvent event) {
           if (scrollController.position.pixels > 0) return;
-          // アニメーションを停止
           _controller.stop();
         },
         onPointerMove: (PointerMoveEvent event) {
           if (scrollController.position.pixels > 0) return;
           final delta = event.delta;
-          // 指が画面上を移動したときの処理
-          print(event.delta.dy > 0);
-          final vert = event.delta.dy > 0 ? "上" : "下";
-          final hori = event.delta.dx > 0 ? "右" : "左";
-          print("ver: $vert hori: $hori");
-
           if (_draggedTopOffset + delta.dy < 0) {
-            print("上にアニメーションしようとしている");
             return;
           }
           setState(() {
@@ -106,19 +86,15 @@ class _DetailPageState extends State<DetailPage>
 
           _topAnimation = Tween<double>(
             begin: _draggedTopOffset,
-            end: _currentTopOffset,
+            end: 0.0,
           ).animate(_controller);
 
           _leftAnimation = Tween<double>(
             begin: _draggedLeftOffset,
-            end: _currentLeftOffset,
+            end: 0.0,
           ).animate(_controller);
 
           _controller.forward(from: 0);
-
-          setState(() {
-            enableScroll = true;
-          });
         },
         child: SingleChildScrollView(
           controller: scrollController,
@@ -137,11 +113,6 @@ class _DetailPageState extends State<DetailPage>
                     ),
                   ),
                 ),
-              ),
-              Container(
-                width: 100,
-                height: 1000,
-                color: Colors.red,
               ),
             ],
           ),
