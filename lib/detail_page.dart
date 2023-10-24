@@ -30,7 +30,7 @@ class _DetailPageState extends State<DetailPage>
     super.initState();
     _scrollController = ScrollController();
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200))
+        vsync: this, duration: const Duration(milliseconds: 100))
       ..addListener(() {
         setState(() {
           _draggedVerticalOffset = _verticalAnimation.value;
@@ -68,7 +68,9 @@ class _DetailPageState extends State<DetailPage>
       backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
         backgroundColor: Colors.blue.withOpacity(imageRatio),
-        elevation: 0,
+        elevation: imageRatio,
+        toolbarOpacity: imageRatio,
+        bottomOpacity: imageRatio,
       ),
       body: Listener(
         onPointerDown: (PointerDownEvent event) {
@@ -129,11 +131,15 @@ class _DetailPageState extends State<DetailPage>
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Text(
-                    "長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列",
-                    style: TextStyle(fontSize: 30),
+                AnimatedOpacity(
+                  opacity: imageRatio,
+                  duration: Duration.zero,
+                  child: const Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Text(
+                      "長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列長い文字列",
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                 )
               ],
