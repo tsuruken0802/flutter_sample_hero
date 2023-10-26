@@ -46,8 +46,17 @@ class _DetailPageState extends State<DetailPage>
     super.dispose();
   }
 
-  double _getImageRatio(double min, double max, double value) {
-    return (value - min) / (max - min);
+  // 写真がどれぐらいドラッグしたかの比率を取得する
+  // minWidth: ドラッグした際の写真の最小幅
+  // initWidth: 初期の写真の幅
+  // currentWidth: 現在の写真の幅
+  // return 比率(0~1の範囲、1だと全くドラッグしていない)
+  double _getImageDraggedRatio(
+    double minWidth,
+    double initWidth,
+    double currentWidth,
+  ) {
+    return (currentWidth - minWidth) / (initWidth - minWidth);
   }
 
   @override
@@ -61,7 +70,7 @@ class _DetailPageState extends State<DetailPage>
         max(initialWidth - _draggedVerticalOffset, animationMixWidth);
     // 現在の写真の縮小の比率(0~1)
     final imageRatio =
-        _getImageRatio(animationMixWidth, initialWidth, imageWidth);
+        _getImageDraggedRatio(animationMixWidth, initialWidth, imageWidth);
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
@@ -82,7 +91,7 @@ class _DetailPageState extends State<DetailPage>
           if (_scrollController.position.pixels > 0) return;
           final delta = event.delta;
           if (_draggedVerticalOffset + delta.dy < 0) {
-            // 上までドラッグできないようにする
+            // 上にドラッグするとクラッシュするので防ぐ
             return;
           }
           setState(() {
