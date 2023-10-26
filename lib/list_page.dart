@@ -24,7 +24,7 @@ class ListPage extends StatelessWidget {
             return GestureDetector(
               onTap: () {
                 final route = PageRouteBuilder(
-                  opaque: false, // 詳細画面から戻る時に透けさせる
+                  opaque: false, // 詳細画面から戻る時に一覧画面を透けさせたいのでfalseを指定する
                   pageBuilder: (context, animation1, animation2) =>
                       DetailPage(imagePath: imagePath),
                   transitionDuration: const Duration(milliseconds: 300),
