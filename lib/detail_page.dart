@@ -65,7 +65,7 @@ class _DetailPageState extends State<DetailPage>
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
-        backgroundColor: Colors.blue.withOpacity(imageRatio),
+        backgroundColor: Colors.red.withOpacity(imageRatio),
         elevation: imageRatio,
         toolbarOpacity: imageRatio,
         bottomOpacity: imageRatio,
