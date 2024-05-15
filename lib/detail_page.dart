@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
-  final String imagePath;
+  final List<String> imagePaths;
 
   const DetailPage({
     super.key,
-    required this.imagePath,
+    required this.imagePaths,
   });
 
   @override
@@ -20,7 +20,10 @@ class _DetailPageState extends State<DetailPage>
   double _draggedVerticalOffset = 0;
   double _draggedHorizontalOffset = 0;
 
+  int _currentPage = 0;
+
   late ScrollController _scrollController;
+  late PageController _pageController;
   late AnimationController _animationController;
   late Animation<double> _verticalAnimation;
   late Animation<double> _horizontalAnimation;
@@ -29,6 +32,7 @@ class _DetailPageState extends State<DetailPage>
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _pageController = PageController();
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 100))
       ..addListener(() {
@@ -37,13 +41,22 @@ class _DetailPageState extends State<DetailPage>
           _draggedHorizontalOffset = _horizontalAnimation.value;
         });
       });
+    _pageController.addListener(_updateCurrentPage);
   }
 
   @override
   void dispose() {
+    _pageController.removeListener(_updateCurrentPage);
+    _pageController.dispose();
     _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _updateCurrentPage() {
+    setState(() {
+      _currentPage = _pageController.page?.ceil().toInt() ?? 0;
+    });
   }
 
   // 写真がどれぐらいドラッグしたかの比率を取得する
@@ -71,6 +84,9 @@ class _DetailPageState extends State<DetailPage>
     // 現在の写真の縮小の比率(0~1)
     final imageRatio =
         _getImageDraggedRatio(animationMixWidth, initialWidth, imageWidth);
+
+    final currentImageId = 'imagePath-${widget.imagePaths[_currentPage]}';
+
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(imageRatio),
       appBar: AppBar(
@@ -124,17 +140,28 @@ class _DetailPageState extends State<DetailPage>
             width: double.infinity, // 写真が縮小に比例してColumnも小さくなりy軸の移動がズレるため固定する
             child: Column(
               children: [
-                Transform.translate(
-                  offset:
-                      Offset(_draggedHorizontalOffset, _draggedVerticalOffset),
-                  child: Hero(
-                    tag: 'imagePath-${widget.imagePath}',
-                    child: SizedBox(
-                      width: imageWidth,
-                      child: Image.asset(
-                        widget.imagePath,
-                        fit: BoxFit.cover,
-                      ),
+                Hero(
+                  tag: currentImageId,
+                  child: SizedBox(
+                    width: imageWidth,
+                    height: imageWidth * 1.2,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: widget.imagePaths.length,
+                      itemBuilder: (context, index) {
+                        final imagePath = widget.imagePaths[index];
+                        return Transform.translate(
+                          offset: Offset(
+                              _draggedHorizontalOffset, _draggedVerticalOffset),
+                          child: SizedBox(
+                            width: imageWidth,
+                            child: Image.asset(
+                              imagePath,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

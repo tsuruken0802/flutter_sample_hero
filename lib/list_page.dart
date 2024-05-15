@@ -26,7 +26,7 @@ class ListPage extends StatelessWidget {
                 final route = PageRouteBuilder(
                   opaque: false, // 詳細画面から戻る時に一覧画面を透けさせたいのでfalseを指定する
                   pageBuilder: (context, animation1, animation2) =>
-                      DetailPage(imagePath: imagePath),
+                      DetailPage(imagePaths: imagePathList),
                   transitionDuration: const Duration(milliseconds: 300),
                 );
                 Navigator.of(context).push(route);
